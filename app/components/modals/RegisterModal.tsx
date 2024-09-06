@@ -8,7 +8,8 @@ import { useCallback, useState } from "react";
 import {FieldValues, SubmitHandler, useForm} from "react-hook-form";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import Modal from "./Modal";
-import Heading from "../Heading"
+import Heading from "../Heading";
+import Input from "../inputs/Input";
 
 const RegisterModal = () => {
   const registerModal = useRegisterModal();
@@ -53,6 +54,14 @@ const bodyContent = (
     <Heading 
       title="Welcome to Lola's Home"
       subtitle="Create an account!"
+    />
+    <Input 
+      id="email"
+      label="Email"
+      disabled={isLoading}
+      register={register}
+      errors={errors}
+      required
     />
   </div>
 )
