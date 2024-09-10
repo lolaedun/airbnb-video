@@ -1,5 +1,5 @@
 import { PrismaAdapter } from "@/node_modules/@next-auth/prisma-adapter/dist/index";
-import Next Auth, { AuthOptions } from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from  "next-auth/providers/github"
 import GoogleProvider from "next-auth/proviiders/google"
 import CredentialsProvider from "next-auth/providers/credentials";
