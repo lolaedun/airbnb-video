@@ -62,74 +62,81 @@ export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async signIn({ account, profile, user }) {
-      try {
-        // Check if the user exists
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email },
-          include: { accounts: true },
-        });
-
-        if (existingUser) {
-          // Check if the provider account is already linked
-          const isAccountLinked = existingUser.accounts.some(
-            (acc) => acc.provider === account.provider && acc.providerAccountId === account.providerAccountId
-          );
-
-          if (isAccountLinked) {
-            // User exists and account is already linked
-            return true;
-          } else {
-            // Link the new provider account to the existing user
-            await prisma.account.create({
-              data: {
-                userId: existingUser.id,
-                provider: account.provider,
-                providerAccountId: account.providerAccountId,
-                access_token: account.access_token || "",
-                refresh_token: account.refresh_token || "",
-                expires_at: account.expires_at || null,
-                type: account.type || 'oauth', // Ensure 'type' is set
-                token_type: account.token_type || "",
-                scope: account.scope || "",
-                id_token: account.id_token || "",
-                session_state: account.session_state || "",
-              },
+        async signIn({ account, profile, user }) {
+          try {
+            const existingUser = await prisma.user.findUnique({
+              where: { email: user.email },
+              include: { accounts: true },
             });
-
-            return true;
-          }
-        } else {
-          // User does not exist, create new user
-          await prisma.user.create({
-            data: {
-              email: user.email,
-              name: user.name,
-              image: user.image,
-              accounts: {
-                create: {
-                  provider: account.provider,
-                  providerAccountId: account.providerAccountId,
-                  access_token: account.access_token || "",
-                  refresh_token: account.refresh_token || "",
-                  expires_at: account.expires_at || null,
-                  type: account.type || 'oauth', // Ensure 'type' is set
-                  token_type: account.token_type || "",
-                  scope: account.scope || "",
-                  id_token: account.id_token || "",
-                  session_state: account.session_state || "",
+      
+            if (existingUser) {
+              // Check if the user has an image, and update it if they logged in with GitHub
+              if (account.provider === "github" && !existingUser.image) {
+                await prisma.user.update({
+                  where: { email: user.email },
+                  data: { image: profile.avatar_url },  // Update image if logging in with GitHub
+                });
+              }
+      
+              const isAccountLinked = existingUser.accounts.some(
+                (acc) => acc.provider === account.provider && acc.providerAccountId === account.providerAccountId
+              );
+      
+              if (!isAccountLinked) {
+                await prisma.account.create({
+                  data: {
+                    userId: existingUser.id,
+                    provider: account.provider,
+                    providerAccountId: account.providerAccountId,
+                    access_token: account.access_token || "",
+                    refresh_token: account.refresh_token || "",
+                    expires_at: account.expires_at || null,
+                    type: account.type || 'oauth',
+                    token_type: account.token_type || "",
+                    scope: account.scope || "",
+                    id_token: account.id_token || "",
+                    session_state: account.session_state || "",
+                  },
+                });
+              }
+              return true;
+            } else {
+              // If the user does not exist, create a new user with the image from GitHub
+              await prisma.user.create({
+                data: {
+                  email: user.email,
+                  name: user.name,
+                  image: profile.avatar_url || user.image,
+                  accounts: {
+                    create: {
+                      provider: account.provider,
+                      providerAccountId: account.providerAccountId,
+                      access_token: account.access_token || "",
+                      refresh_token: account.refresh_token || "",
+                      expires_at: account.expires_at || null,
+                      type: account.type || 'oauth',
+                      token_type: account.token_type || "",
+                      scope: account.scope || "",
+                      id_token: account.id_token || "",
+                      session_state: account.session_state || "",
+                    },
+                  },
                 },
-              },
-            },
-          });
-
-          return true;
-        }
+              });
+              return true;
+            }
       } catch (error) {
         console.error('Error in signIn callback:', error);
         return false;
       }
     },
+        // Adding the session callback
+        async session({ session, token, user }) {
+            // Attach user.id and user.image to the session object
+            session.user.id = token.sub; // token.sub contains the user's ID in JWT strategy
+            session.user.image = user?.image || session.user.image; // Ensure image is available
+            return session;
+          },
   },
 };
 
