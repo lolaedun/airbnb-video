@@ -2,6 +2,7 @@
 import React from 'react';
 import { useRouter, useSearchParams  } from "next/navigation";
 import { useCallback } from "react";
+import qs from 'query-string';
 
 interface CategoryBoxProps  {
     label: string;
@@ -18,9 +19,30 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
     const params = useSearchParams();
     const handleClick = useCallback(() => {
         let currentQuery = {};
-    }, []);
+        
+        if (params) {
+          currentQuery = qs.parse(params.toString())
+        }
+        const updatedQuery: any = {
+            ...currentQuery,
+            category: label
+          }
+        if (params?.get('category') === label) {
+        delete updatedQuery.category;
+        }
+    
+        const url = qs.stringifyUrl({
+        url: '/',
+        query: updatedQuery
+        }, { skipNull: true });
+
+        router.push(url);
+
+    }, [label, router, params]);
   return (
-    <div className={`
+    <div 
+    onClick={handleClick}
+    className={`
     flex 
     flex-col 
     items-center 
