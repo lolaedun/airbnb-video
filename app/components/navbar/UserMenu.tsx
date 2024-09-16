@@ -23,13 +23,14 @@ const UserMenu:React.FC<UserMenuProps> = ({currentUser}) => {
         setIsOpen((value) => !value);
     
     }, []);
+  
 
     return(
         <div className="relative">
             <div className="flex flex-row items-center gap-3">
                 <div 
                     onClick={() => {}}
-                    className="md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
+                    className="hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer">
                         Choose your home
                 </div>
                 <div
@@ -89,7 +90,7 @@ const UserMenu:React.FC<UserMenuProps> = ({currentUser}) => {
                 )}
                 </div>
             </div>
-            
+           
         </div>
     );
 }
