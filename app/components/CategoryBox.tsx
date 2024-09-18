@@ -1,4 +1,4 @@
-'use Client';
+'use client';
 import React from 'react';
 import { useRouter, useSearchParams  } from "next/navigation";
 import { useCallback } from "react";

@@ -29,25 +29,44 @@ const Modal: React.FC<ModalProps> = ({
     secondaryActionLabel
 }) => {
     const [showModal, setShowModal] = useState(isOpen);
+    
+
+
     useEffect(() => {
         setShowModal(isOpen);
-    }, [isOpen]);
-
-    const handleClose = useCallback(() => {
-        if (disabled) return;
-        
+      }, [isOpen]);
+    
+      const handleClose = useCallback(() => {
+        if (disabled) {
+          return;
+        }
+      
         setShowModal(false);
         setTimeout(() => {
-            onClose();
-        }, 300);
-    }, [disabled, onClose]);
-
-    const handleSubmit = useCallback(() => {
-        if (disabled) {
-            return;
+          onClose();
+        }, 300)
+      }, [disabled, onClose]);
+    
+      const handleClickOutside = useCallback((event: any) => {
+        if (modalRef.current && !modalRef.current.contains(event.target)) {
+          handleClose();
         }
+      }, [handleClose]);
+    
+      useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+          document.removeEventListener('mousedown', handleClickOutside);
+        };
+      }, [handleClickOutside]);
+    
+      const handleSubmit = useCallback(() => {
+        if (disabled) {
+          return;
+        }
+    
         onSubmit();
-    }, [disabled, onSubmit]);
+      }, [disabled, onSubmit]);
 
     const handleSecondaryAction = useCallback(() => {
         if (disabled || !secondaryAction) {
