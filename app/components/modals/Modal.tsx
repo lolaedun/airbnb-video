@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import Button from "../Button"
+import Button from "../Button";
 
 interface ModalProps {
     isOpen?: boolean;
@@ -117,7 +117,9 @@ const Modal: React.FC<ModalProps> = ({
                                 w-full
                                 bg-white
                                 outline-none
-                                focus:outline-none">
+                                focus:outline-none"
+                                
+                                >
                             
 
                                 {/*HEADER*/}
