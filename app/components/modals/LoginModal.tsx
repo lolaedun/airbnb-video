@@ -30,14 +30,11 @@ const LoginModal = () => {
     handleSubmit,
     formState: {
       errors,
-    },
+    }
   } = useForm<FieldValues> ({
-    defaultValues: {
-      
+    defaultValues: {    
       email:'',
       password:''
-
-
     },
 
   });
